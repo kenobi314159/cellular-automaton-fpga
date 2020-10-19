@@ -39,7 +39,7 @@ cell_auto.print_cell_states()
 # Run first few steps of calculation
 print("============")
 cell_auto.reset()
-for e in range(1,20):
+for e in range(1,9):
     print("------------")
     cell_auto.set_gen_limit(e)
     cell_auto.start()

@@ -49,6 +49,16 @@ Test_Glider8_12x8_4 | 2355 | 659 | 80.4 MHz
 * Test_Glider4_12x8_4 - Testing Glider 4 (7 explicit rules, 5-connected neighbouring; 2-bit state). Automaton size 12x8. 4-way associative ROM. 5 cycles per generation.
 * Test_Glider8_12x8_4 - Testing Glider 8 (25 explicit rules, 9-connected neighbouring; 3-bit state). Automaton size 12x8. 4-way associative ROM. 10 cycles per generation.
 
+# CYC1000 top limit CA configuration
+
+I have also created a few configurations using the Game of Life rules to test the CYC1000 FPGA limitations. These designs were tested on 50 MHz frequency.
+
+CA size | Parallel ROM ways | FPFA resources usage [%] | Computation speed [generations per second]
+:---:|:---:|:---:|:---:
+50x50 | 1 | ~95 | ~220 000
+32x32 | 7 | ~98 | ~1 380 000
+16x16 | 16 | ~99 | ~2 470 000
+
 ## Address space
 ```
 0xOOOO - 0x7FFF -- System module
