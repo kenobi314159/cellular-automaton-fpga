@@ -80,6 +80,11 @@ CA size | Parallel ROM ways | FPFA resources usage [%] | Computation speed [gene
                              Read current Cell's State (anytime)
                              0xDEADBEEF when out of bounds
 ```
+
+## Demonstration
+
+A short demonstration video can be found on YouTube [here](https://www.youtube.com/watch?v=hjwHe8eW5a8).
+
 ## License
 The Cellular Automaton FPGA is available under the MIT license (MIT). Please read [LICENSE file](LICENSE).
 Some components used in this project (mainly the UART2WB unit) have been adopted from Jakub Cabal's project [RMII Firewall FPGA](https://github.com/jakubcabal/rmii-firewall-fpga).
