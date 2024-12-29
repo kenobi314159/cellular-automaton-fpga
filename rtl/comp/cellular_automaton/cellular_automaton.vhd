@@ -34,7 +34,7 @@ port (
     --          Write 1 to Start/Resume
     --          Write 2 to Reset and Stop
     -- 0x0001 - Generations Limit Register (R/W)
-    --          Write number of generations to count (Only when stopped)
+    --          Write number of generations to count (only when stopped)
     --          Write 0 for unlimited counting
     -- 0x0002 - Current Generation Register (R/-)
     --          Index of generation after last Control Register Reset
@@ -42,9 +42,10 @@ port (
     -- 0x0003 - Configured Column Size Register (R/-)
     -- 0x0004 - Configured Row Size Register (R/-)
     -- 0x0003-0x3FFF - 0xDEADCAFE
-    -- 0x4000-0x7FFF - Cells' States (R/-)
-    --                 Read current Cell's State (anytime)
-    --                 0xDEADBEEF when out of bounds
+    -- 0x4000-0x7FFF - Cells' States (R/W)
+    --                 Read current Cell's State (any time)
+    --                 Read 0xDEADBEEF when out of bounds
+    --                 Write new Cell's State (only when stopped)
     -- Cells addressing:
     --   0 1 2
     --   3 4 5
@@ -82,8 +83,12 @@ architecture FULL of CELLULAR_AUTOMATON is
     -- Constants
     -- -------------------------------------------------------------------------
 
-    -- Type for field of sells in one long row
+    -- Type for field of cells in one long row
     type cell_long_row_t is array (ROW_SIZE*COL_SIZE-1 downto 0) of cell_state_t;
+    -- Types for simple wires between cells
+    type wire_row_t      is array (ROW_SIZE         -1 downto 0) of std_logic;
+    type wire_field_t    is array (COL_SIZE         -1 downto 0) of wire_row_t;
+    type wire_long_row_t is array (ROW_SIZE*COL_SIZE-1 downto 0) of std_logic;
 
     -----------------------------------------------------------------------------
 
@@ -107,6 +112,10 @@ architecture FULL of CELLULAR_AUTOMATON is
     signal cell_neighbours  : neigh_arr_2d_t;
     signal cell_state       : cell_field_t;
     signal cell_state_lined : cell_long_row_t;
+
+    signal forced_state          : cell_state_t;
+    signal forced_state_en       : wire_field_t;
+    signal forced_state_en_lined : wire_long_row_t;
 
     constant BLINK_CNT_WIDTH     : integer := 26;
     constant PROGRESS_STEP_WIDTH : integer := log2(LEDS_NUM);
@@ -271,7 +280,10 @@ begin
                 SW_RESET   => cells_reset,
 
                 NEIGHBOURS => cell_neighbours(i)(e),
-                STATE      => cell_state     (i)(e)
+                STATE      => cell_state     (i)(e),
+
+                FORCED_STATE     => forced_state         ,
+                FORCED_STATE_EN  => forced_state_en(i)(e)
             );
         end generate;
     end generate;
@@ -345,13 +357,46 @@ begin
         end loop;
     end process;
 
+    -- Forced cell state writing
+    forced_state_wr_pr : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+
+            for i in 0 to C_STATE_WIDTH-1 loop
+                forced_state(i) <= WB_DIN(i);
+            end loop;
+            forced_state_en_lined <= (others => '0');
+
+            -- Writing from WB
+            if (cells_en='0' and WB_WR='1' and WB_ADDR(14)='1') then
+                if (unsigned(WB_ADDR(14-1 downto 0))<COL_SIZE*ROW_SIZE) then
+                    forced_state_en_lined(to_integer(unsigned(WB_ADDR(14-1 downto 0)))) <= '1';
+                end if;
+            end if;
+
+            if (RESET='1') then
+                forced_state_en_lined <= (others => '0');
+            end if;
+        end if;
+    end process;
+
+    -- Forced cell state un-lining
+    forced_state_unlining_p : process (forced_state_en_lined)
+    begin
+        for i in 0 to COL_SIZE-1 loop
+            for e in 0 to ROW_SIZE-1 loop
+                forced_state_en(i)(e) <= forced_state_en_lined(i*ROW_SIZE+e);
+            end loop;
+        end loop;
+    end process;
+
     -- -------------------------------------------------------------------------
 
     -- -------------------------------------------------------------------------
     -- LEDs control
     -- -------------------------------------------------------------------------
 
-    -- counter for LEDs blinking
+    -- Counter for LEDs blinking
     leds_blink_cnt_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
