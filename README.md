@@ -1,5 +1,9 @@
 # Cellular Automaton FPGA
-This project implements a configurable FPGA-accelerated Cellular Automaton. The user can preconfigure the size, transition function and a few other parameters of Automaton using a python script. Each Cell of the Automaton is then implemented in the FPGA's logic and runs in parallel with the other ones. After being loaded to the FPGA, the Automaton can be controlled and analyzed through a Wishbone bus connected to UART interface. The target device of the project is FPGA board CYC1000 by Trenz Electronic.
+This project implements a configurable FPGA-accelerated Cellular Automaton.
+The user can preconfigure the size, transition function and a few other parameters of the Automaton using a python script.
+Each Cell of the Automaton is then implemented in the FPGA's logic and runs in parallel with the other ones.
+After being loaded to the FPGA, the Automaton can be controlled and analyzed through a Wishbone bus connected to a UART interface.
+The target device of the project is [FPGA board CYC1000](https://wiki.trenz-electronic.de/display/PD/TEI0003+Getting+Started) by Trenz Electronic.
 
 ## Top level diagram
 ```
@@ -21,13 +25,21 @@ PORT --->| MASTER  |
 
 * UART2WB MASTER - Transmits the Wishbone requests and responses via UART interface (Wishbone bus master module).
 * SYSTEM MODULE - Basic system control and status registers (version, debug space etc.) accessible via Wishbone bus.
-* CELLULAR AUTOMATON - The automaton itself, with all
+* CELLULAR AUTOMATON - The automaton itself.
 
 ## Cell architecture
 
-My original intention was to utilize the FPGA logic resources as much as possible by mapping each cell's transition function directly to VHDL. This way, the Automaton was able to calculate new generation in every clock cycle. However, this had a drastic effect on the design's complexity. When attempting to create a Cellular Automaton with 3-bit state and 9-connected neighbouring, the generated VHDL package with the transition function had over 800 MB and could not be sinthesized in Quartus due to lack of RAM space.
+The original intention was to utilize the FPGA logic resources as much as possible by mapping each cell's transition function directly to VHDL.
+This way, the Automaton was able to calculate new generation in every clock cycle.
+However, this had a drastic effect on the design's complexity.
+When attempting to create a Cellular Automaton with 3-bit state and 9-connected neighbouring, the generated VHDL package with the transition function had over 800 MB and could not be synthesized in Quartus due to lack of RAM space.
 
-For this reason I have decided to instead implement the Cell's transition function using an N-way associative memory, which only contains transition rules explicitely given by the user's configuration. All other rules are implicitly set to 'no state change'. The downside of this solution is, that each generation requires multiple-cycle comparisson of the associative memory with the current input vector. The total number of cycles needed for each transition is dependent on the number of explicit rules given by the user and the number N of parallel ways of the associative memory. This number is given as parameter to the configuration script and allows for variable trade-off between the Automaton speed and resource consumption. Higher values of N lead to higher number of input vector comparisson blocks in each Cell.
+For this reason the project instead implements the Cell's transition function using an N-way associative memory, which only contains transition rules explicitely given by the user's configuration.
+All other rules are implicitly set to 'no state change'.
+The downside of this solution is, that each generation requires multiple-cycle comparison of the associative memory with the current input vector.
+The total number of cycles needed for each transition is dependent on the number of explicit rules given by the user and the number N of parallel ways of the associative memory.
+This number is given as parameter to the configuration script and allows for variable trade-off between the Automaton speed and resource consumption.
+Higher values of N lead to higher number of input vector comparison blocks in each Cell, but also lower number of cycles needed to compare all the rules.
 
 ## Resource usage summary
 
@@ -44,14 +56,15 @@ Test_Glider8_12x8_4 | 2355 | 659 | 80.4 MHz
 # Configurations description:
 
 * GoF_10x6_4 - Game of Life (228 explicit rules; 9-connected neighbouring; 1-bit state). Automaton size 10x6. 4-way associative ROM. 60 cycles per generation.
-* GoF_20x12_4 - Game of Life. Automaton size 10x6.
+* GoF_20x12_4 - Game of Life. Automaton size 20x12.
 * GoF_10x6_8 - Game of Life. 8-way associative ROM. 32 cycles per generation.
 * Test_Glider4_12x8_4 - Testing Glider 4 (7 explicit rules, 5-connected neighbouring; 2-bit state). Automaton size 12x8. 4-way associative ROM. 5 cycles per generation.
 * Test_Glider8_12x8_4 - Testing Glider 8 (25 explicit rules, 9-connected neighbouring; 3-bit state). Automaton size 12x8. 4-way associative ROM. 10 cycles per generation.
 
 # CYC1000 top limit CA configuration
 
-I have also created a few configurations using the Game of Life rules to test the CYC1000 FPGA limitations. These designs were tested on 50 MHz frequency.
+The project also contains a few example configurations using the [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) rules to test the CYC1000 FPGA limitations.
+These designs were tested on 50 MHz frequency.
 
 CA size | Parallel ROM ways | FPFA resources usage [%] | Computation speed [generations per second]
 :---:|:---:|:---:|:---:
@@ -87,4 +100,4 @@ A short demonstration video can be found on YouTube [here](https://www.youtube.c
 
 ## License
 The Cellular Automaton FPGA is available under the MIT license (MIT). Please read [LICENSE file](LICENSE).
-Some components used in this project (mainly the UART2WB unit) have been adopted from Jakub Cabal's project [RMII Firewall FPGA](https://github.com/jakubcabal/rmii-firewall-fpga).
+Some components used in this project have been adopted from project [RMII Firewall FPGA](https://github.com/jakubcabal/rmii-firewall-fpga) by Jakub Cabal.
