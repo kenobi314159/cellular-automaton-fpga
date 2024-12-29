@@ -61,7 +61,7 @@ begin
         if (rising_edge(CLK)) then
             case WB_ADDR is
                 when X"0000" =>
-                    WB_DOUT <= X"20201017";
+                    WB_DOUT <= X"20241229";
                 when X"0004" =>
                     WB_DOUT <= debug_reg;
                 when others =>
