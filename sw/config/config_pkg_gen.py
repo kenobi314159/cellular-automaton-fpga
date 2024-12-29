@@ -125,7 +125,7 @@ class cell_auto_config:
             self.trans_list += [rule_zero for x in range(self.rom_ways)]
 
         print("Resulting number of explicit transition rules:",len(self.trans_list))
-        print("Number of ROM items, which will actually be checked in each calculation step:",self.act_rom_items)
+        print("Number of ROM items which will actually be checked in each calculation step:",self.act_rom_items)
         print("Number of clock cycles required for each calculation step: %d+%d=%d" % (self.act_rom_items,3,self.act_rom_items+3))
 
         return max_val
