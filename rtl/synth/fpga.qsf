@@ -24,7 +24,7 @@ set_location_assignment PIN_N6 -to RST_BTN_N
 set_location_assignment PIN_T7 -to UART_TXD
 set_location_assignment PIN_R7 -to UART_RXD
 
-set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Lite Edition"
+set_global_assignment -name LAST_QUARTUS_VERSION "23.1std.1 Lite Edition"
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
