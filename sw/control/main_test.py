@@ -16,8 +16,6 @@ from cellular_automat import *
 # Define parameters
 parser = ArgumentParser()
 
-parser.add_argument("columns",type=int,help="Number of columns of controlled Automaton")
-parser.add_argument("rows",type=int,help="Number of rows of controlled Automaton")
 parser.add_argument("--port",default="COM4",help="Target device serial port name (default: COM4)")
 
 # Parse arguments
@@ -29,7 +27,7 @@ wb = wishbone(args.port)
 sys_mod = sys_module(wb)
 sys_mod.report()
 
-cell_auto = cellular_automat(wb,0x8000,(args.columns,args.rows))
+cell_auto = cellular_automat(wb,0x8000)
 
 # Init FPGA Automaton
 cell_auto.reset()

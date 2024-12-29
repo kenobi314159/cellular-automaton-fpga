@@ -39,6 +39,8 @@ port (
     -- 0x0002 - Current Generation Register (R/-)
     --          Index of generation after last Control Register Reset
     --          Might overflow when Generations Limit is set to 0
+    -- 0x0003 - Configured Column Size Register (R/-)
+    -- 0x0004 - Configured Row Size Register (R/-)
     -- 0x0003-0x3FFF - 0xDEADCAFE
     -- 0x4000-0x7FFF - Cells' States (R/-)
     --                 Read current Cell's State (anytime)
@@ -228,6 +230,10 @@ begin
                     WB_DOUT <= std_logic_vector(gen_limit_reg);
                 elsif (unsigned(WB_ADDR)=2) then
                     WB_DOUT <= std_logic_vector(gen_curr_reg);
+                elsif (unsigned(WB_ADDR)=3) then
+                    WB_DOUT <= std_logic_vector(to_unsigned(COL_SIZE, 32));
+                elsif (unsigned(WB_ADDR)=4) then
+                    WB_DOUT <= std_logic_vector(to_unsigned(ROW_SIZE, 32));
                 end if;
             else
                 WB_DOUT <= X"DEADBEEF";

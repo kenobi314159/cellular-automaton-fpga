@@ -88,6 +88,8 @@ CA size | Parallel ROM ways | FPFA resources usage [%] | Computation speed [gene
 0x8002 -- Automaton - Current Generation Register (R/-)
                       Index of generation after last Control Register Reset
                       Might overflow when Generations Limit is set to 0
+0x0003 -- Automaton - Configured Column Size Register (R/-)
+0x0004 -- Automaton - Configured Row Size Register (R/-)
 0x8003-0xBFFF -- Automaton - 0xDEADCAFE
 0xC000-0xFFFF -- Automaton - Cells' States (R/-)
                              Read current Cell's State (anytime)
