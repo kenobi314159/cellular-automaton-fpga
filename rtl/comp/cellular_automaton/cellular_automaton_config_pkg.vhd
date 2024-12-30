@@ -14,7 +14,7 @@ package CELLULAR_AUTOMATON_CONFIG_PKG is
 
     -- 2-logarithm function
     function log2(number : integer) return integer;
-    
+
     -- Number of cells in one ROW
     constant ROW_SIZE      : integer := 12;
     -- Number of cells in one COLUMN

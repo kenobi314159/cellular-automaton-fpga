@@ -48,18 +48,18 @@ if __name__ == '__main__':
     print("\nREAD from 0x0:")
     rd = wb.read(0x0)
     print("0x%02X" % rd)
-    
+
     print("\nREAD from 0x1:")
     rd = wb.read(0x1)
     print("0x%02X" % rd)
-    
+
     print("\nREAD from 0x2:")
     rd = wb.read(0x2)
     print("0x%02X" % rd)
 
     print("\nWRITE 0x20 to 0x1.")
     wb.write(0x1,0x20)
-    
+
     print("\nREAD from 0x1:")
     rd = wb.read(0x1)
     print("0x%02X" % rd)

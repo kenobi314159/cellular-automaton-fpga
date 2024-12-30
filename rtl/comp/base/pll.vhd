@@ -90,7 +90,7 @@ architecture RTL of PLL is
             areset : in  std_logic;
             inclk  : in  std_logic_vector(1 downto 0);
             clk    : out std_logic_vector(4 downto 0);
-            locked : out std_logic 
+            locked : out std_logic
     );
     end component;
 

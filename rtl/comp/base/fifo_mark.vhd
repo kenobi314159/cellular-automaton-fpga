@@ -72,7 +72,7 @@ begin
     rd_data_vld_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RD_REQ = '1') then 
+            if (RD_REQ = '1') then
                 RD_DATA_VLD <= not cmp_empty;
             end if;
         end if;

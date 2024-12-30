@@ -95,7 +95,7 @@ begin
     -- -------------------------------------------------------------------------
     --  UART RXD CROSS DOMAIN CROSSING
     -- -------------------------------------------------------------------------
-    
+
     uart_rxd_cdc_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
