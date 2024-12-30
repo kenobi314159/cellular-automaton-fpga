@@ -16,8 +16,6 @@ from cellular_automat import *
 # Define parameters
 parser = ArgumentParser()
 
-parser.add_argument("columns",type=int,help="Number of columns of controlled Automaton")
-parser.add_argument("rows",type=int,help="Number of rows of controlled Automaton")
 parser.add_argument("--port",default="COM4",help="Target device serial port name (default: COM4)")
 
 # Parse arguments
@@ -29,7 +27,7 @@ wb = wishbone(args.port)
 sys_mod = sys_module(wb)
 sys_mod.report()
 
-cell_auto = cellular_automat(wb,0x8000,(args.columns,args.rows))
+cell_auto = cellular_automat(wb,0x8000)
 
 # Init FPGA Automaton
 cell_auto.reset()
@@ -48,6 +46,42 @@ for e in range(1,9):
     cell_auto.print_cell_states()
 
 # TEST 2
+# Write state different from initial state
+# and run a few steps
+print("============")
+cell_auto.reset()
+print("------------")
+cell_auto.set_gen_limit(1)
+cell_auto.start()
+cell_auto.stop()
+state = []
+for i in range(cell_auto.grid_size[1]):
+    line = []
+    for e in range(cell_auto.grid_size[0]):
+        line.append(cell_auto.read_cell_state((e,i)))
+    state.append(line)
+print("State after 1 step")
+cell_auto.print_cell_states()
+print("------------")
+cell_auto.set_gen_limit(2)
+cell_auto.start()
+cell_auto.stop()
+print("State after next step")
+cell_auto.print_cell_states()
+print("------------")
+for i in range(cell_auto.grid_size[1]):
+    for e in range(cell_auto.grid_size[0]):
+        cell_auto.write_cell_state((e,i), state[i][e])
+print("State after writing step 1 back")
+cell_auto.print_cell_states()
+print("------------")
+cell_auto.set_gen_limit(3)
+cell_auto.start()
+cell_auto.stop()
+print("State after next step again")
+cell_auto.print_cell_states()
+
+# TEST 3
 # Test computation speed when doubling
 # generations limit several times
 print("============")

@@ -37,9 +37,15 @@ class cell_auto_config:
         self.trans_list     = None
         self.rom_addr_width = None
         self.act_rom_items  = None
+
+        self.error = 0
         
         val0 = self.parse_init_file()
+        if (self.error):
+            return
         val1 = self.parse_trans_file()
+        if (self.error):
+            return
         max_val = val0 if (val0>val1) else val1
         self.state_w = ceil(log(max_val+1,2))
         
@@ -57,16 +63,19 @@ class cell_auto_config:
                     self.init_state[-1].append(int(v))
         if (len(self.init_state)==0):
             print("Error: Input file "+self.init_in_file+" contains 0 readable rows.")
-            return -1
+            self.error = -1
+            return self.error
         self.rows = len(self.init_state)
         self.cols = len(self.init_state[0])
+        print("Detected automaton size: "+str(self.cols)+"x"+str(self.rows))
         max_val = 1
         #print("init state:")
         for i,r in enumerate(self.init_state):
             #print(i,r)
             if (len(r)!=self.cols):
-                print("Error: Input file "+self.init_in_file+" contains "+self.cols+" readable columns on row 0 but "+str(len(r))+" readable columns on row "+str(i)+".")
-                return -1
+                print("Error: Input file "+self.init_in_file+" contains "+str(self.cols)+" readable columns on row 0 but "+str(len(r))+" readable columns on row "+str(i)+".")
+                self.error = -1
+                return self.error
             for v in r:
                 if (v>max_val):
                     max_val = v
@@ -88,10 +97,12 @@ class cell_auto_config:
                     self.is_five_conn = (len(i)==5)
                 if (self.is_five_conn and len(i)!=5):
                     print("Error: Transition table in input file "+self.trans_tab_in_file+" detected as five-connected, but line "+line+" contains "+str(len(i))+" inputs.")
-                    return -2
+                    self.error = -2
+                    return self.error
                 if (not self.is_five_conn and len(i)!=9):
                     print("Error: Transition table in input file "+self.trans_tab_in_file+" detected as nine-connected, but line "+line+" contains "+str(len(i))+" inputs.")
-                    return -2
+                    self.error = -2
+                    return self.error
                 
                 i = tuple([int(x) for x in i])
                 o = int(o)
@@ -125,7 +136,7 @@ class cell_auto_config:
             self.trans_list += [rule_zero for x in range(self.rom_ways)]
 
         print("Resulting number of explicit transition rules:",len(self.trans_list))
-        print("Number of ROM items, which will actually be checked in each calculation step:",self.act_rom_items)
+        print("Number of ROM items which will actually be checked in each calculation step:",self.act_rom_items)
         print("Number of clock cycles required for each calculation step: %d+%d=%d" % (self.act_rom_items,3,self.act_rom_items+3))
 
         return max_val
@@ -290,5 +301,7 @@ if (__name__=="__main__"):
 
     # Run configuration generator
     ca_config = cell_auto_config(args.init_state_file,args.trans_table_file,args.vhdl_pkg_output,args.rom_ways,args.max_m_block_cells)
+    if (ca_config.error!=0):
+        exit(ca_config.error)
     ca_config.generate_pkg_file()
     

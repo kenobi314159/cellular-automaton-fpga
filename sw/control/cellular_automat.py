@@ -7,10 +7,10 @@
 #-------------------------------------------------------------------------------
 
 class cellular_automat:
-    def __init__(self, wishbone, base_addr=0x8000, grid_size=(3,3)):
+    def __init__(self, wishbone, base_addr=0x8000):
         self.wb = wishbone
         self.ba = base_addr
-        self.grid_size = grid_size
+        self.grid_size = (self.read_row_size(), self.read_col_size())
 
     def read_ctrl_reg(self):
         v = self.wb.read(self.ba+0x0)
@@ -21,9 +21,17 @@ class cellular_automat:
     def read_current_gen(self):
         v = self.wb.read(self.ba+0x2)
         return v
+    def read_col_size(self):
+        v = self.wb.read(self.ba+0x3)
+        return v
+    def read_row_size(self):
+        v = self.wb.read(self.ba+0x4)
+        return v
     def read_cell_state(self,coords=(0,0)):
         v = self.wb.read(self.ba+0x4000+coords[0]+coords[1]*self.grid_size[0])
         return v
+    def write_cell_state(self,coords=(0,0), value=0):
+        self.wb.write(self.ba+0x4000+coords[0]+coords[1]*self.grid_size[0], value)
     def print_cell_states(self):
         for i in range(self.grid_size[1]):
             line = ""

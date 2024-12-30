@@ -34,7 +34,11 @@ port(
     NEIGHBOURS : in  neigh_t;
 
     -- State of this Cell
-    STATE      : buffer cell_state_t
+    STATE      : buffer cell_state_t;
+
+    -- Forced state overwrite from outside
+    FORCED_STATE     : cell_state_t;
+    FORCED_STATE_EN  : std_logic
 );
 end entity;
 
@@ -203,6 +207,10 @@ begin
             -- Update Cell State after comparison is done
             if (present_st=S_NEXT_GEN) then
                 STATE <= next_cell_state_reg;
+            end if;
+            -- Overwrite state if forced
+            if (FORCED_STATE_EN='1') then
+                STATE <= FORCED_STATE;
             end if;
             if (RESET='1' or SW_RESET='1') then
                 STATE <= INIT_STATE(ROW)(COL);
