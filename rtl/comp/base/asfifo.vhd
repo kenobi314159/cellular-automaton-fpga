@@ -60,7 +60,7 @@ architecture RTL of ASFIFO is
         wrreq	: in  std_logic;
         q	    : out std_logic_vector(DATA_WIDTH-1 downto 0);
         rdempty	: out std_logic;
-        wrfull	: out std_logic 
+        wrfull	: out std_logic
     );
     end component;
 

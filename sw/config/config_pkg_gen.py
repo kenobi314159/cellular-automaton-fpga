@@ -39,7 +39,7 @@ class cell_auto_config:
         self.act_rom_items  = None
 
         self.error = 0
-        
+
         val0 = self.parse_init_file()
         if (self.error):
             return
@@ -48,7 +48,7 @@ class cell_auto_config:
             return
         max_val = val0 if (val0>val1) else val1
         self.state_w = ceil(log(max_val+1,2))
-        
+
     def parse_init_file(self):
         self.init_state = []
         with open(self.init_in_file,"r") as f:
@@ -80,7 +80,7 @@ class cell_auto_config:
                 if (v>max_val):
                     max_val = v
         return max_val
-        
+
     def parse_trans_file(self):
         self.trans_list = []
         max_val = 1
@@ -103,7 +103,7 @@ class cell_auto_config:
                     print("Error: Transition table in input file "+self.trans_tab_in_file+" detected as nine-connected, but line "+line+" contains "+str(len(i))+" inputs.")
                     self.error = -2
                     return self.error
-                
+
                 i = tuple([int(x) for x in i])
                 o = int(o)
                 self.trans_list.append((i,o))
@@ -200,15 +200,15 @@ class cell_auto_config:
             f.write("use IEEE.std_logic_1164.all;\n")
             f.write("use IEEE.numeric_std.all;\n")
             f.write("\n")
-            
+
             # Package declarations and correct definitions
             f.write("package CELLULAR_AUTOMATON_CONFIG_PKG is\n")
-            
+
             # Constant part of the package
             f.write("""
     -- 2-logarithm function
     function log2(number : integer) return integer;
-    
+
     -- Number of cells in one ROW
     constant ROW_SIZE      : integer := %d;
     -- Number of cells in one COLUMN
@@ -252,15 +252,15 @@ class cell_auto_config:
 
             # Init state declaration and definition
             self.write_init_state_def(f)
-                
+
             # Transition rules ROM declaration and definition
             self.write_trans_rule_rom(f)
 
-            f.write("    -- -------------------------------------------------------------------------\n") 
+            f.write("    -- -------------------------------------------------------------------------\n")
             f.write("\n")
             f.write("end CELLULAR_AUTOMATON_CONFIG_PKG;\n")
             f.write("\n")
-            
+
             # Package body (constant)
             f.write("package body CELLULAR_AUTOMATON_CONFIG_PKG is\n")
             f.write("""
@@ -304,4 +304,4 @@ if (__name__=="__main__"):
     if (ca_config.error!=0):
         exit(ca_config.error)
     ca_config.generate_pkg_file()
-    
+

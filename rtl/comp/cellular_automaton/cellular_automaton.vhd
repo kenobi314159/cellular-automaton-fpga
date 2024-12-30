@@ -58,7 +58,7 @@ port (
     WB_STALL : out std_logic; -- not ARDY
     WB_ACK   : out std_logic; -- DRDY
     WB_DOUT  : out std_logic_vector(32-1 downto 0);
-    
+
     -- ----------------------------------------
 
     -- ----------------------------------------
@@ -101,10 +101,10 @@ architecture FULL of CELLULAR_AUTOMATON is
 
     signal control_reg     : std_logic;
     signal start_reg       : std_logic;
-    
+
     signal gen_limit_reg : unsigned(32-1 downto 0);
     signal gen_curr_reg  : unsigned(32-1 downto 0);
-    
+
     signal gen_cycle_reg : unsigned(log2(GEN_CYCLES)-1 downto 0);
 
     signal cells_en         : std_logic;
@@ -124,7 +124,7 @@ architecture FULL of CELLULAR_AUTOMATON is
     signal next_progress_led     : unsigned(log2(LEDS_NUM)-1 downto 0);
     signal leds_blink            : std_logic_vector(2**(log2(LEDS_NUM))-1 downto 0);
     signal leds_progress         : std_logic_vector(2**(log2(LEDS_NUM))-1 downto 0);
-    
+
     ---------------------------------------------------------------------------
 
 begin
@@ -162,7 +162,7 @@ begin
     end process;
 
     -- -------------------------------------------------------------------------
-    
+
     -- -------------------------------------------------------------------------
     -- Generations Limit Register
     -- -------------------------------------------------------------------------
@@ -170,7 +170,7 @@ begin
     gen_limit_reg_pr : process (CLK)
     begin
         if (rising_edge(CLK)) then
-        
+
             -- Writing new value when stopped
             if (control_reg='0' and WB_WR='1' and unsigned(WB_ADDR)=1) then
                 gen_limit_reg <= unsigned(WB_DIN);
@@ -185,7 +185,7 @@ begin
     gen_curr_reg_pr : process (CLK)
     begin
         if (rising_edge(CLK)) then
-        
+
             -- Increment when running until limit is reached
             if (gen_cycle_reg=GEN_CYCLES-1) then
                 gen_curr_reg <= gen_curr_reg+1;
@@ -201,7 +201,7 @@ begin
             end if;
         end if;
     end process;
-    
+
     gen_cycle_reg_pr : process (CLK)
     begin
         if (rising_edge(CLK)) then
@@ -219,17 +219,17 @@ begin
     end process;
 
     -- -------------------------------------------------------------------------
-    
+
     -- -------------------------------------------------------------------------
     -- Wishbone Reading Register
     -- -------------------------------------------------------------------------
-    
+
     wb_din_pr : process (CLK)
     begin
         if (rising_edge(CLK)) then
             -- Allways send response after 1 cycle
             WB_ACK <= WB_STB and WB_CYC;
-            
+
             -- Reading on WB
             if (WB_ADDR(14)='0') then
                 WB_DOUT <= X"DEADCAFE";
@@ -297,7 +297,7 @@ begin
         cell_neighbours <= (others => (others => (others => (others => '0'))));
 
         for r in 0 to COL_SIZE-1 loop
-            
+
             if (r=0) then
                 r_u := COL_SIZE-1;
             else

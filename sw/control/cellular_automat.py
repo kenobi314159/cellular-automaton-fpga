@@ -39,7 +39,7 @@ class cellular_automat:
                 line += "%02d " % (self.read_cell_state((e,i)))
             print(line)
         return 0
-        
+
     def start(self):
         self.wb.write(self.ba+0x0,1)
     def stop(self):
